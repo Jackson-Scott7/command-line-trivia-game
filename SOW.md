@@ -6,29 +6,29 @@ Statement of Work (SOW) Socket Programming Project
 
 ### Project Title:
 
-[Insert Project Title]
+[Command-Line-Trivia Game]
 
 ### Team:
 
-[Insert members of team]
+[Jackson Scott]
 
 ### Project Objective:
 
-[Briefly describe the goal of the project. What problem are you trying to solve or what functionality are you aiming to achieve?]
+[The goal of this project is to provide a command line trivia game that allows for multiple players to play the game at the same time. It should also accurately keep track of each players correct answers and display the winner at the end of the game.]
 
 ### Scope:
 
 #### Inclusions:
 
--   [List the specific tasks, features, or components that will be included in the project.]
+-   [This project will include a text-based command line interface. A server script written in python and a client script also written in python.]
 
 #### Exclusions:
 
--   [List any tasks, features, or components that will not be included in the project.]
+-   [This project will exclude a web based UI.]
 
 ### Deliverables:
 
--   [List the expected outputs or deliverables from the project, such as a working Python script, documentation, or presentations.]
+-   [Working server.py and client.py scripts. Clean and unique command-line interface. Thorough README.md file that makes it easy for anyone to use the gaem.]
 
 ### Timeline:
 
@@ -48,20 +48,17 @@ Statement of Work (SOW) Socket Programming Project
 
 #### Software:
 
--   [List the necessary software tools, programming languages (Python), libraries (socket, threading, etc.), and operating systems.]
+-   [Users will need a current version python downloaded and also Lib/socket.py. MacOS, modern UNIX, or Windows opperating system must also be used.]
 
 ### Assumptions:
 
--   [State any assumptions that are being made about the project, such as network connectivity or availability of resources.]
+-   [Project assumes users have a network connection and all technical requirements have been met.]
 
 ### Roles and Responsibilities:
 
--   [Define the roles of team members, including project manager, developers, testers, etc., and their responsibilities.]
+-   [Jackson Scott - Sole project contributor]
 
 ### Communication Plan:
 
--   [Outline the communication channels and frequency for project updates, meetings, and decision-making.]
+-   [I will keep a callendar for myself with the important dates and deliverables that are needed by those dates.]
 
-### Additional Notes:
-
--   [Include any other relevant information or considerations that are specific to your project.]
