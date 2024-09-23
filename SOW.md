@@ -34,21 +34,32 @@ Statement of Work (SOW) Socket Programming Project
 
 #### Key Milestones:
 
--   [Outline the major milestones or checkpoints throughout the project, with estimated completion dates.]
-
-#### Task Breakdown:
-
--   [Create a detailed breakdown of tasks, assigning estimated hours or days to each.]
+-   [Implement TCP server & client](October 6)
+-   [Design and Implement message protocol](October 20)
+-   [Multi-Player functionality, synchronize states across clients](November 3)
+-   [Gameplay, Game State, UI](November 17)
+-   [Implement error handling and testing](December 6) 
 
 ### Technical Requirements:
 
 #### Hardware:
 
--   [Specify any hardware requirements, such as servers, networking equipment, or specific devices.]
+##### Processor (CPU):
+###### Minimum:  A low-end CPU like Intel Core i3 or equivalent will work fine.
+###### Recommended: Intel Core i5 or higher for better overall performance and multitasking.
+##### Memory (RAM):
+###### Minimum: 2 GB of RAM is sufficient for basic Python programs and socket communication.
+###### Recommended: 4 GB or higher if you are multitasking or running other applications alongside.
+##### Storage:
+###### Minimum: Around 100 MB of storage is more than enough for Python and the socket-based trivia game files.
+###### Recommended: A few GB of free space for comfort, especially if you plan to add more features or libraries over time.
+##### Networking:
+###### Minimum: Standard Ethernet or Wi-Fi for basic communication.
+###### Recommended: A stable and reliable internet connection if you plan to run the game over the internet (vs. a local network).
 
 #### Software:
 
--   [Users will need a current version python downloaded and also Lib/socket.py. MacOS, modern UNIX, or Windows opperating system must also be used.]
+-   [Users will need a version python 3.6 or later downloaded, Lib/socket.py library dowloaded, and an IDE like VSCode is recommended. MacOS, modern UNIX, or Windows opperating system must also be used.]
 
 ### Assumptions:
 
