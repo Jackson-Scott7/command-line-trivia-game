@@ -94,34 +94,7 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 3.  Each player will be prompted to enter a unique username.
 4.  Players will receive questions from the server and can answer them directly in the terminal.
 
-**Example Gameplay**
---------------------
 
-### **Server Terminal**:
-
-`python server.py
-Server listening on 127.0.0.1:12345...
-Enter 'start' to send a new question or 'quit' to stop:`
-
-### **Client Terminal**:
-
-`python client.py
-Connected to server at 127.0.0.1:12345
-Enter your username: player1
---- Game State ---
-Scores:
-  player1: 0
-  player2: 0
-------------------`
-`Current Question: What is the capital of France?
-------------------`
-`Enter your answer for question Q1 (or type 'quit' to leave): paris
-Server says: Correct!
---- Game State ---
-Scores:
-  player1: 1
-  player2: 0
-------------------`
 
 **Requirements**
 ----------------
