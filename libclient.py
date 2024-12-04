@@ -82,8 +82,11 @@ class Message:
 
     def _process_response_json_content(self):
         content = self.response
-        result = content.get("result")
-        print(f"got result: {result}")
+        if "question" in content:
+            print(f"Question: {content['question']}")
+        elif "result" in content:
+            print(f"Result: {content['result']}")
+            print(f"Score from this round: {content.get('score', 0)}")
 
     def _process_response_binary_content(self):
         content = self.response

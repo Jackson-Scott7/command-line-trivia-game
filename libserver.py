@@ -3,12 +3,13 @@ import selectors
 import json
 import io
 import struct
+import random
 
-request_search = {
-    "morpheus": "Follow the white rabbit. \U0001f430",
-    "ring": "In the caves beneath the Misty Mountains. \U0001f48d",
-    "\U0001f436": "\U0001f43e Playing ball! \U0001f3d0",
-}
+questions = [
+    {"question": "What is the capital of France?", "answer": "Paris"},
+    {"question": "What is 2 + 2?", "answer": "4"},
+    {"question": "What is the chemical symbol for water?", "answer": "H2O"},
+]
 
 
 class Message:
@@ -90,12 +91,20 @@ class Message:
 
     def _create_response_json_content(self):
         action = self.request.get("action")
+    
         if action == "search":
             query = self.request.get("value")
             answer = request_search.get(query) or f'No match for "{query}".'
             content = {"result": answer}
+        
+        elif action == "start_trivia":
+            # Respond with the trivia game starting message and a sample question
+            content = {
+                "result": "Welcome to the Trivia Game! Here is your first question:\nWhat is the capital of France?"
+            }
+        
         else:
-            content = {"result": f'Error: invalid action "{action}".'}
+            content = {"result": f'Error: invalid action "{action}".'}    
         content_encoding = "utf-8"
         response = {
             "content_bytes": self._json_encode(content, content_encoding),
@@ -103,6 +112,7 @@ class Message:
             "content_encoding": content_encoding,
         }
         return response
+
 
     def _create_response_binary_content(self):
         response = {
