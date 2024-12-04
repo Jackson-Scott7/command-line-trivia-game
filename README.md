@@ -105,23 +105,23 @@ Enter 'start' to send a new question or 'quit' to stop:`
 
 ### **Client Terminal**:
 
-python client.py
+`python client.py
 Connected to server at 127.0.0.1:12345
 Enter your username: player1
 --- Game State ---
 Scores:
   player1: 0
   player2: 0
-------------------
-Current Question: What is the capital of France?
-------------------
-Enter your answer for question Q1 (or type 'quit' to leave): paris
+------------------`
+`Current Question: What is the capital of France?
+------------------`
+`Enter your answer for question Q1 (or type 'quit' to leave): paris
 Server says: Correct!
 --- Game State ---
 Scores:
   player1: 1
   player2: 0
-------------------
+------------------`
 
 **Requirements**
 ----------------
