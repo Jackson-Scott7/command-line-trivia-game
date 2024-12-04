@@ -12,20 +12,12 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 
     -   Run the `server.py` script to start the server:
 
-        sh
-
-        Copy code
-
         `python server.py`
 
     -   The server will listen for incoming client connections and manage the trivia questions and game state.
 2.  **Connect Clients**:
 
     -   Run the `client.py` script on different machines or multiple terminals to connect clients to the server:
-
-        sh
-
-        Copy code
 
         `python client.py`
 
@@ -87,10 +79,6 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 1.  Open a terminal.
 2.  Run the server script to start the game:
 
-    sh
-
-    Copy code
-
     `python server.py`
 
 3.  Once all players are connected, type `start` in the server terminal to begin asking trivia questions.
@@ -100,10 +88,6 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 
 1.  Open separate terminals for each player.
 2.  Run the client script to join the game:
-
-    sh
-
-    Copy code
 
     `python client.py`
 
@@ -115,21 +99,13 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 
 ### **Server Terminal**:
 
-sh
-
-Copy code
-
 `python server.py
 Server listening on 127.0.0.1:12345...
 Enter 'start' to send a new question or 'quit' to stop:`
 
 ### **Client Terminal**:
 
-sh
-
-Copy code
-
-`python client.py
+python client.py
 Connected to server at 127.0.0.1:12345
 Enter your username: player1
 --- Game State ---
@@ -145,7 +121,7 @@ Server says: Correct!
 Scores:
   player1: 1
   player2: 0
-------------------`
+------------------
 
 **Requirements**
 ----------------
