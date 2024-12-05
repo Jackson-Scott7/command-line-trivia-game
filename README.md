@@ -112,3 +112,13 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 
 -   **`server.py`**: Runs the server-side of the trivia game, handling client connections, managing questions, tracking scores, and determining the winner.
 -   **`client.py`**: Runs the client-side of the trivia game, allowing players to connect, submit answers, and receive game updates.
+
+**Security Risks**
+---------------------
+
+- *No Authentication or Authorization:* The game does not authenticate clients or enforce unique identities, making it vulnerable to impersonation or unauthorized access. *Mitigation:* Implement a secure login system using hashed passwords and session tokens.
+- *Input Validation Vulnerabilities:* The game does not validate inputs rigorously, which may lead to injection attacks or unexpected behavior. *Mitigation:* Sanitize and validate all client inputs, especially JSON data, to prevent injection and malformed payloads.
+- *Denial of Service (Dos) Risk:* The server could be overwhelmed by a large number of connections or malicious requests, leading to resource exhaustion. *Mitigation:* Implement rate limiting and connection throttling to handle abusive clients.
+- *Replay Attacks:* Since there is no mechanism to prevent the reuse of intercepted messages, attackers can replay valid requests. *Mitigation:* Use nonce values or timestamps in messages and enforce strict validation on the server side.
+- *Code Injection Risk:* The lack of constraints on inputs such as chat messages could open the game to code injection vulnerabilities. *Mitigation:* Strictly sanitize all user-generated content and use libraries that escape potentially harmful characters.
+- *User Enumeration:* The server's feedback for duplicate usernames reveals which usernames are already taken, aiding attackers in user enumeration. *Mitigation:* Return generic error messages that do not disclose this information.
