@@ -10,16 +10,16 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 
 1.  **Start the Server**:
 
-    -   Run the `server.py` script to start the server:
+    -   Run the `Server.py` script to start the server:
 
-        `python server.py`
+        `python3 Server.py -p PORT`
 
     -   The server will listen for incoming client connections and manage the trivia questions and game state.
 2.  **Connect Clients**:
 
-    -   Run the `client.py` script on different machines or multiple terminals to connect clients to the server:
+    -   Run the `Client.py` script on different machines or multiple terminals to connect clients to the server:
 
-        `python client.py`
+        `python3 Client.py -i SERVER_IP/DNS -p PORT`
 
     -   Each client will be prompted to enter a unique username to join the game.
     -   Multiple clients (players) can join before starting the game.

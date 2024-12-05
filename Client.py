@@ -1,22 +1,20 @@
 import socket
 import logging
 import json
+import argparse
+from colorama import Fore, Style
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Server configurations
-HOST = '127.0.0.1'
-PORT = 12345
-
 USERNAME = None  # Global variable to store the client's username
 game_state = {}  # Store game state locally
 
-def connect_to_server():
+def connect_to_server(host, port):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        client_socket.connect((HOST, PORT))
-        logging.info(f"Connected to server at {HOST}:{PORT}")
+        client_socket.connect((host, port))
+        logging.info(f"Connected to server at {host}:{port}")
         return client_socket
     except Exception as e:
         logging.error(f"Failed to connect to server: {e}")
@@ -35,23 +33,37 @@ def handle_response(client_socket):
                 message, buffer = buffer.split("\n", 1)
                 if message:
                     data = json.loads(message)
+
                     if data['type'] == 'start':
-                        logging.info(f"New question: {data['question']}")
+                        # New questions in green
+                        print(f"{Fore.CYAN}New question: {data['question']}{Style.RESET_ALL}")
                         answer_question(client_socket, data['question_id'])
-                    
+
                     elif data['type'] == 'response':
                         feedback = data.get('feedback', "No feedback provided")
-                        logging.info(f"Server says: {feedback}")
-                    
+                        if data.get('correct') is True:
+                            # Correct answers displayed in green
+                            print(f"{Fore.GREEN}Server says: {feedback}{Style.RESET_ALL}")
+                        elif data.get('correct') is False:
+                            # Incorrect answers displayed in red
+                            print(f"{Fore.RED}Server says: {feedback}{Style.RESET_ALL}")
+                        else:
+                            # Neutral feedback in default color
+                            print(f"Server says: {feedback}")
+
                     elif data['type'] == 'chat':
                         chat_message = data.get('message', "No message provided")
-                        logging.info(f"Chat: {chat_message}")
+                        if "has left the game" in chat_message or "disconnected" in chat_message:
+                            # Player disconnection messages in red
+                            print(f"{Fore.YELLOW}Chat: {chat_message}{Style.RESET_ALL}")
+                        else:
+                            print(f"Chat: {chat_message}")
 
                     elif data['type'] == 'game_state':
                         update_game_state(data['state'])
-                    
+
                     else:
-                        logging.warning(f"Unknown message type: {data['type']}")
+                        print(f"Unknown message type: {data['type']}")
 
         except Exception as e:
             logging.error(f"Error receiving message: {e}")
@@ -65,7 +77,7 @@ def answer_question(client_socket, question_id):
             return
         send_message(client_socket, {
             'type': 'answer',
-            'username': USERNAME,  # Use the stored username
+            'username': USERNAME,
             'question_id': question_id,
             'answer': answer
         })
@@ -94,7 +106,13 @@ def update_game_state(state):
 
 def main():
     global USERNAME
-    client_socket = connect_to_server()
+
+    parser = argparse.ArgumentParser(description="Connect to the trivia game server.")
+    parser.add_argument("-i", "--ip", type=str, required=True, help="Server IP or DNS")
+    parser.add_argument("-p", "--port", type=int, required=True, help="Server port")
+    args = parser.parse_args()
+
+    client_socket = connect_to_server(args.ip, args.port)
     if client_socket:
         while True:
             USERNAME = input("Enter your username: ")

@@ -2,13 +2,10 @@ import socket
 import threading
 import logging
 import json
+import argparse
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
-
-# Server configurations
-HOST = '127.0.0.1'
-PORT = 12345
 
 clients = []
 game_state = {
@@ -52,45 +49,6 @@ def broadcast_game_state():
         }
     })
     broadcast(game_state_message)
-
-# Function to handle each client connection
-def handle_client(client_socket, client_address):
-    logging.info(f"New connection from {client_address}")
-    username = None
-    try:
-        while True:
-            message = client_socket.recv(1024).decode('utf-8').strip()
-            if not message:
-                break
-            data = json.loads(message)
-            logging.info(f"Received message from {client_address}: {data}")
-
-            message_type = data.get('type')
-            if message_type == 'join':
-                username = data.get('username')
-                handle_join(data, client_socket)
-            elif message_type == 'answer':
-                handle_answer(data, client_socket)
-            elif message_type == 'quit':
-                handle_quit(data, client_socket)
-                break
-            else:
-                logging.error(f"Unknown message type: {message_type}")
-    except Exception as e:
-        logging.error(f"Error with client {client_address}: {e}")
-    finally:
-        if username:
-            game_state['scores'].pop(username, None)
-            broadcast_game_state()
-            broadcast(json.dumps({
-                'type': 'chat',
-                'username': 'Server',
-                'message': f"{username} has disconnected from the game."
-            }))
-        client_socket.close()
-        if client_socket in clients:
-            clients.remove(client_socket)
-        logging.info(f"Connection with {client_address} closed")
 
 # Handle a player joining the game
 def handle_join(data, client_socket):
@@ -219,13 +177,71 @@ def announce_winner():
     }))
     logging.info(winner_message)
 
+# Handle each client connection
+def handle_client(client_socket, client_address):
+    logging.info(f"New connection from {client_address}")
+    username = None
+    try:
+        while True:
+            message = client_socket.recv(1024).decode('utf-8').strip()
+            if not message:
+                break
+            data = json.loads(message)
+            logging.info(f"Received message from {client_address}: {data}")
+
+            message_type = data.get('type')
+            if message_type == 'join':
+                username = data.get('username')
+                handle_join(data, client_socket)
+            elif message_type == 'answer':
+                handle_answer(data, client_socket)
+            elif message_type == 'quit':
+                handle_quit(data, client_socket)
+                break
+            else:
+                logging.error(f"Unknown message type: {message_type}")
+    except Exception as e:
+        logging.error(f"Error with client {client_address}: {e}")
+    finally:
+        if username:
+            game_state['scores'].pop(username, None)
+            broadcast_game_state()
+            broadcast(json.dumps({
+                'type': 'chat',
+                'username': 'Server',
+                'message': f"{username} has disconnected from the game."
+            }))
+        client_socket.close()
+        if client_socket in clients:
+            clients.remove(client_socket)
+        logging.info(f"Connection with {client_address} closed")
+
+# Thread to handle server commands
+def handle_server_commands():
+    global current_question_index
+    while True:
+        command = input("Enter 'start' to send a new question or 'quit' to stop the server: ").strip().lower()
+        if command == "start":
+            current_question_index = 0
+            send_question_to_all()
+        elif command == "quit":
+            logging.info("Shutting down the server.")
+            for client_socket in clients:
+                client_socket.close()
+            clients.clear()
+            exit()
+        else:
+            logging.warning("Unknown command. Use 'start' or 'quit'.")
+
 # Main function to start the server
-def start_server():
+def start_server(host, port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((HOST, PORT))
+    server_socket.bind((host, port))
     server_socket.listen(5)
 
-    logging.info(f"Server listening on {HOST}:{PORT}...")
+    logging.info(f"Server listening on {host}:{port}...")
+
+    threading.Thread(target=handle_server_commands, daemon=True).start()
 
     while True:
         try:
@@ -237,11 +253,8 @@ def start_server():
             logging.error(f"Error accepting connection: {e}")
 
 if __name__ == "__main__":
-    threading.Thread(target=start_server).start()
-    while True:
-        command = input("Enter 'start' to send a new question or 'quit' to stop: ").strip().lower()
-        if command == "start":
-            current_question_index = 0
-            send_question_to_all()
-        elif command == "quit":
-            break
+    parser = argparse.ArgumentParser(description="Start the trivia game server.")
+    parser.add_argument("-p", "--port", type=int, required=True, help="Port to listen on")
+    args = parser.parse_args()
+
+    start_server("0.0.0.0", args.port)
