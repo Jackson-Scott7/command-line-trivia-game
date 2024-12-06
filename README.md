@@ -79,7 +79,7 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 1.  Open a terminal.
 2.  Run the server script to start the game:
 
-    `python server.py`
+    `python3.8 Server.py -p <PORT>`
 
 3.  Once all players are connected, type `start` in the server terminal to begin asking trivia questions.
 4.  The server will guide the game through all the questions and eventually announce the winner(s).
@@ -89,7 +89,7 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 1.  Open separate terminals for each player.
 2.  Run the client script to join the game:
 
-    `python client.py`
+    `python3.8 Client.py -i <SERVER_IP/DNS> -p <PORT>`
 
 3.  Each player will be prompted to enter a unique username.
 4.  Players will receive questions from the server and can answer them directly in the terminal.
@@ -110,8 +110,8 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 **Project Structure**
 ---------------------
 
--   **`server.py`**: Runs the server-side of the trivia game, handling client connections, managing questions, tracking scores, and determining the winner.
--   **`client.py`**: Runs the client-side of the trivia game, allowing players to connect, submit answers, and receive game updates.
+-   **`Server.py`**: Runs the server-side of the trivia game, handling client connections, managing questions, tracking scores, and determining the winner.
+-   **`Client.py`**: Runs the client-side of the trivia game, allowing players to connect, submit answers, and receive game updates.
 
 **Security Risks**
 ---------------------
@@ -122,3 +122,13 @@ This is a multiplayer Command Line Trivia Game implemented in Python, using sock
 - *Replay Attacks:* Since there is no mechanism to prevent the reuse of intercepted messages, attackers can replay valid requests. *Mitigation:* Use nonce values or timestamps in messages and enforce strict validation on the server side.
 - *Code Injection Risk:* The lack of constraints on inputs such as chat messages could open the game to code injection vulnerabilities. *Mitigation:* Strictly sanitize all user-generated content and use libraries that escape potentially harmful characters.
 - *User Enumeration:* The server's feedback for duplicate usernames reveals which usernames are already taken, aiding attackers in user enumeration. *Mitigation:* Return generic error messages that do not disclose this information.
+
+**Roadmap**
+---------------------
+With this project there is plenty of room for expansion and improvement. A key improvement would be enhancing the user interface from a command-line-based UI to a more modern, interactive web-based UI. This could be done using frameworks like Flask for the backend and React.js for the frontend. This would make the game more visually appealing and accessable. Some other potential changes could be adding different difficulty/levels to the game to allow user to have a challenging or more relaxed way of playing the game. The last potential change I would make going forward would be to add mobile responsiveness or even creating a dedicated mobile app for the game. This would greatly increase the prjects reach and appeal.
+
+**Retrospective**
+---------------------
+- *What went well:* The project is able to allow for real-time multiplayer gameplay. This is great because it allows multiple clients to connect to the server and play the game simultaniously. The project also has dynamic question handling, sending each question one at a time and waiting for every client to answer before sending the next question. Another thing that went was is the connection management. The project handles client connections and disconnections while leaving the gameplay uninterrupted for the reamaining players.
+- *What went wrong:* On my local maching the game was working great and I had everything the way I wanted it to be, but when I had to make it work on the cs120 lab machines I ran into a lot of errors and had to change some aspects of the game that I enjoyed in order to make it run on the lab machines. I probably should have just developed the whole game on the lab machines, that way I would ensure it wouldn't need any changes when it came time for the demos. 
+- *Potential improvements:* The error handling and integration testing were kind of rushed on my end, simply because I didn't leave myself enough time to fully ensure a robust game. Another thing that could be improved on is the UI. As of now it's pretty simple and could be made more visually engaging for the user. Also the list of security risks is quite extensive so I believe if I want to take this project any further those would need to be addressed first.

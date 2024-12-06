@@ -31,43 +31,35 @@ def handle_response(client_socket):
             buffer += client_socket.recv(1024).decode('utf-8')
             while "\n" in buffer:
                 message, buffer = buffer.split("\n", 1)
-                if message:
-                    data = json.loads(message)
-
-                    if data['type'] == 'start':
-                        # New questions in green
-                        print(f"{Fore.CYAN}New question: {data['question']}{Style.RESET_ALL}")
-                        answer_question(client_socket, data['question_id'])
-
-                    elif data['type'] == 'response':
-                        feedback = data.get('feedback', "No feedback provided")
-                        if data.get('correct') is True:
-                            # Correct answers displayed in green
-                            print(f"{Fore.GREEN}Server says: {feedback}{Style.RESET_ALL}")
-                        elif data.get('correct') is False:
-                            # Incorrect answers displayed in red
-                            print(f"{Fore.RED}Server says: {feedback}{Style.RESET_ALL}")
-                        else:
-                            # Neutral feedback in default color
-                            print(f"Server says: {feedback}")
-
-                    elif data['type'] == 'chat':
-                        chat_message = data.get('message', "No message provided")
-                        if "has left the game" in chat_message or "disconnected" in chat_message:
-                            # Player disconnection messages in red
-                            print(f"{Fore.YELLOW}Chat: {chat_message}{Style.RESET_ALL}")
-                        else:
-                            print(f"Chat: {chat_message}")
-
-                    elif data['type'] == 'game_state':
-                        update_game_state(data['state'])
-
-                    else:
-                        print(f"Unknown message type: {data['type']}")
-
+                if message.strip():
+                    try:
+                        data = json.loads(message.strip())
+                        process_message(client_socket, data)
+                    except json.JSONDecodeError as e:
+                        logging.error(f"Failed to decode JSON message: {message.strip()}, error: {e}")
         except Exception as e:
             logging.error(f"Error receiving message: {e}")
             break
+
+def process_message(client_socket, data):
+    if data['type'] == 'start':
+        print(f"{Fore.CYAN}New question: {data['question']}{Style.RESET_ALL}")
+        answer_question(client_socket, data['question_id'])
+    elif data['type'] == 'response':
+        feedback = data.get('feedback', "No feedback provided")
+        if data.get('correct') is True:
+            print(f"{Fore.GREEN}Server says: {feedback}{Style.RESET_ALL}")
+        elif data.get('correct') is False:
+            print(f"{Fore.RED}Server says: {feedback}{Style.RESET_ALL}")
+        else:
+            print(f"Server says: {feedback}")
+    elif data['type'] == 'chat':
+        chat_message = data.get('message', "No message provided")
+        print(f"Chat: {chat_message}")
+    elif data['type'] == 'game_state':
+        update_game_state(data['state'])
+    else:
+        print(f"Unknown message type: {data['type']}")
 
 def answer_question(client_socket, question_id):
     while True:
@@ -117,12 +109,20 @@ def main():
         while True:
             USERNAME = input("Enter your username: ")
             send_message(client_socket, {'type': 'join', 'username': USERNAME})
-            response = client_socket.recv(1024).decode('utf-8').strip()
-            data = json.loads(response)
-            if "already taken" not in data.get('feedback', ''):
-                break
-            print(data.get('feedback'))
-        handle_response(client_socket)
+            response_buffer = client_socket.recv(1024).decode('utf-8').strip()
+            
+            # Split the buffer into individual JSON messages
+            for response in response_buffer.split("\n"):
+                if response.strip():
+                    try:
+                        data = json.loads(response)
+                        if "already taken" not in data.get('feedback', ''):
+                            break
+                        print(data.get('feedback'))
+                    except json.JSONDecodeError as e:
+                        logging.error(f"JSON decode error: {e}")
+                        continue
+            handle_response(client_socket)
 
 if __name__ == "__main__":
     main()

@@ -29,17 +29,19 @@ questions = [
 
 current_question_index = 0
 
-# Function to broadcast messages to all clients
+def safe_send(client_socket, message):
+    try:
+        client_socket.send((message + "\n").encode('utf-8'))
+    except BrokenPipeError:
+        logging.error(f"Client {client_socket} disconnected unexpectedly.")
+        if client_socket in clients:
+            clients.remove(client_socket)
+
 def broadcast(message, sender_socket=None):
     for client_socket in clients[:]:
         if client_socket != sender_socket:
-            try:
-                client_socket.send((message + "\n").encode('utf-8'))
-            except Exception as e:
-                logging.error(f"Error sending message to {client_socket}: {e}")
-                clients.remove(client_socket)
+            safe_send(client_socket, message)
 
-# Broadcast the entire game state to all clients
 def broadcast_game_state():
     game_state_message = json.dumps({
         'type': 'game_state',
@@ -50,7 +52,6 @@ def broadcast_game_state():
     })
     broadcast(game_state_message)
 
-# Handle a player joining the game
 def handle_join(data, client_socket):
     username = data.get('username')
     if username in game_state['scores']:
@@ -58,7 +59,7 @@ def handle_join(data, client_socket):
             'type': 'response',
             'feedback': "Username already taken. Please choose a different one."
         })
-        client_socket.send((response + "\n").encode('utf-8'))
+        safe_send(client_socket, response)
         return
 
     game_state['scores'][username] = 0
@@ -66,18 +67,15 @@ def handle_join(data, client_socket):
         'type': 'response',
         'feedback': f"Welcome {username} to the trivia game!"
     })
-    try:
-        client_socket.send((welcome_message + "\n").encode('utf-8'))
-        broadcast(json.dumps({
-            'type': 'chat',
-            'username': 'Server',
-            'message': f"{username} has joined the game!"
-        }), client_socket)
-        broadcast_game_state()
-    except Exception as e:
-        logging.error(f"Error sending welcome message: {e}")
+    safe_send(client_socket, welcome_message)
 
-# Handle a player's answer
+    broadcast(json.dumps({
+        'type': 'chat',
+        'username': 'Server',
+        'message': f"{username} has joined the game!"
+    }), client_socket)
+    broadcast_game_state()
+
 def handle_answer(data, client_socket):
     username = data.get('username')
     question_id = data.get('question_id')
@@ -87,19 +85,17 @@ def handle_answer(data, client_socket):
         logging.error("Answer request missing required fields")
         return
 
-    # Validate question ID
     if question_id != game_state['current_question_id']:
         response = json.dumps({
             'type': 'response',
             'correct': False,
             'feedback': "Invalid question ID or no active question."
         })
-        client_socket.send((response + "\n").encode('utf-8'))
+        safe_send(client_socket, response)
         return
 
-    # Check if the answer is correct
     is_correct = (answer.lower() == game_state['correct_answer'].lower())
-    feedback = "Correct!" if is_correct else f"Incorrect! The correct answer was {game_state['correct_answer']}."
+    feedback = "Correct!" if is_correct else (f"Incorrect! The correct answer was {game_state['correct_answer']}.")
 
     if is_correct:
         game_state['scores'][username] += 1
@@ -111,15 +107,13 @@ def handle_answer(data, client_socket):
         'correct': is_correct,
         'feedback': feedback
     })
-    client_socket.send((response + "\n").encode('utf-8'))
+    safe_send(client_socket, response)
 
-    # If all clients have answered, proceed to the next question or end the game
     if game_state['answers_received'] >= len(game_state['scores']):
         game_state['question_answered'] = True
         broadcast_game_state()
         next_question_or_end_game()
 
-# Handle a player quitting the game
 def handle_quit(data, client_socket):
     username = data.get('username')
     if username:
@@ -132,7 +126,6 @@ def handle_quit(data, client_socket):
         clients.remove(client_socket)
         broadcast_game_state()
 
-# Send the next question or end the game
 def next_question_or_end_game():
     global current_question_index
     if current_question_index + 1 < len(questions):
@@ -141,7 +134,6 @@ def next_question_or_end_game():
     else:
         announce_winner()
 
-# Send a new question to all clients
 def send_question_to_all():
     global current_question_index
     current_question = questions[current_question_index]
@@ -160,7 +152,6 @@ def send_question_to_all():
     broadcast(message)
     broadcast_game_state()
 
-# Announce the winner(s) after all questions are answered
 def announce_winner():
     max_score = max(game_state['scores'].values())
     winners = [player for player, score in game_state['scores'].items() if score == max_score]
@@ -177,7 +168,6 @@ def announce_winner():
     }))
     logging.info(winner_message)
 
-# Handle each client connection
 def handle_client(client_socket, client_address):
     logging.info(f"New connection from {client_address}")
     username = None
@@ -216,7 +206,6 @@ def handle_client(client_socket, client_address):
             clients.remove(client_socket)
         logging.info(f"Connection with {client_address} closed")
 
-# Thread to handle server commands
 def handle_server_commands():
     global current_question_index
     while True:
@@ -233,7 +222,6 @@ def handle_server_commands():
         else:
             logging.warning("Unknown command. Use 'start' or 'quit'.")
 
-# Main function to start the server
 def start_server(host, port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
